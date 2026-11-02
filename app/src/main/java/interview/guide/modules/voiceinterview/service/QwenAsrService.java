@@ -112,13 +112,12 @@ public class QwenAsrService {
      * Initialize the ASR service.
      * This method is automatically called by Spring after the service is constructed
      * and all configuration values have been loaded from VoiceInterviewProperties.
-     *
-     * @throws IllegalStateException if apiKey is not configured
      */
     @PostConstruct
     public void init() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalStateException("API key must be configured before initializing QwenAsrService");
+            log.warn("QwenAsrService 未配置 API Key，语音面试的语音识别不可用");
+            return;
         }
         log.info("QwenAsrService initialized with model: {}, url: {}", model, url);
     }

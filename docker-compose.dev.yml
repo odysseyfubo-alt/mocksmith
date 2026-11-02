@@ -26,7 +26,8 @@ services:
     image: redis:7
     container_name: interview-redis
     ports:
-      - "6379:6379"
+      # 宿主端口可覆盖：本机 6379 被 Windows 原生 Redis 3.0 占用时，在 .env 里设 REDIS_HOST_PORT=6380
+      - "${REDIS_HOST_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:

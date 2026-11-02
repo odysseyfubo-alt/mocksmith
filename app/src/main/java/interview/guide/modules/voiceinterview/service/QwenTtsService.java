@@ -95,13 +95,12 @@ public class QwenTtsService {
      * Initialize the TTS service.
      * This method is automatically called by Spring after the service is constructed
      * and all configuration values have been loaded from VoiceInterviewProperties.
-     *
-     * @throws IllegalStateException if apiKey is not configured
      */
     @PostConstruct
     public void init() {
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalStateException("API key must be configured before initializing QwenTtsService");
+            log.warn("QwenTtsService 未配置 API Key，语音面试的语音合成不可用");
+            return;
         }
         log.info("QwenTtsService initialized with model: {}, voice: {}, sampleRate: {}Hz",
                  model, voice, sampleRate);

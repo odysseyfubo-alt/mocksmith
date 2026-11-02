@@ -20,62 +20,26 @@ const PROVIDER_PRESETS: Record<string, {
   embeddingDimensions?: number;
   supportsEmbedding: boolean;
 }> = {
-  dashscope: {
-    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    models: [
-      { value: 'qwen3.6-flash', label: 'Qwen3.6 Flash — 最新旗舰' },
-      { value: 'qwen3.5-plus', label: 'Qwen3.5 Plus — 高性能' },
-      { value: 'qwen3.5-flash', label: 'Qwen3.5 Flash — 性价比' },
-      { value: 'qwen3-max', label: 'Qwen3 Max — 旗舰' },
-      { value: 'qwen-max', label: 'Qwen Max — 稳定版' },
-      { value: 'qwen-plus', label: 'Qwen Plus — 均衡' },
-      { value: 'qwen-flash', label: 'Qwen Flash — 经济' },
-      { value: 'qwq-32b', label: 'QwQ-32B — 推理专用' },
-    ],
-    embeddingModels: [
-      { value: 'text-embedding-v3', label: 'text-embedding-v3 — 推荐' },
-    ],
-    embeddingDimensions: 1024,
-    supportsEmbedding: true,
-  },
   deepseek: {
     baseUrl: 'https://api.deepseek.com',
     models: [
-      { value: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash — 最新·快速' },
+      { value: 'deepseek-flash', label: 'DeepSeek Flash — 快速·默认' },
       { value: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro — 最强推理' },
-      { value: 'deepseek-chat', label: 'DeepSeek V3.2 — 旧版对话（即将弃用）' },
-      { value: 'deepseek-reasoner', label: 'DeepSeek R1 — 旧版推理（即将弃用）' },
     ],
     supportsEmbedding: false,
   },
-  glm: {
-    baseUrl: 'https://open.bigmodel.cn/api/coding/paas/v4',
+  siliconflow: {
+    baseUrl: 'https://api.siliconflow.cn/v1',
     models: [
-      { value: 'glm-5.1', label: 'GLM-5.1 — 最新旗舰' },
-      { value: 'glm-5', label: 'GLM-5 — 旗舰' },
-      { value: 'glm-4.7', label: 'GLM-4.7 — Coding 强' },
-      { value: 'glm-4.7-flash', label: 'GLM-4.7 Flash — 免费' },
-      { value: 'glm-4.6', label: 'GLM-4.6 — 200K 上下文' },
-      { value: 'glm-4-plus', label: 'GLM-4 Plus — 高性能' },
-      { value: 'glm-4-air-250414', label: 'GLM-4 Air — 高性价比' },
-      { value: 'glm-4-flash-250414', label: 'GLM-4 Flash — 免费' },
+      { value: 'deepseek-ai/DeepSeek-V3', label: 'DeepSeek V3 — 硅基托管' },
+      { value: 'Qwen/Qwen3-32B', label: 'Qwen3 32B — 硅基托管' },
     ],
     embeddingModels: [
-      { value: 'embedding-3', label: 'embedding-3 — 推荐' },
+      { value: 'Qwen/Qwen3-Embedding-0.6B', label: 'Qwen3 Embedding 0.6B — 1024 维·推荐' },
+      { value: 'Qwen/Qwen3-Embedding-8B', label: 'Qwen3 Embedding 8B — 更准·更慢' },
     ],
     embeddingDimensions: 1024,
     supportsEmbedding: true,
-  },
-  kimi: {
-    baseUrl: 'https://api.moonshot.cn/v1',
-    models: [
-      { value: 'kimi-k2.6', label: 'Kimi K2.6 — 最新最智能' },
-      { value: 'kimi-k2.5', label: 'Kimi K2.5 — 多模态' },
-      { value: 'kimi-k2', label: 'Kimi K2 — MoE 基座' },
-      { value: 'kimi-k2-thinking', label: 'Kimi K2 Thinking — 深度推理' },
-      { value: 'kimi-latest', label: 'kimi-latest — 自动最新' },
-    ],
-    supportsEmbedding: false,
   },
 };
 
@@ -277,7 +241,7 @@ export default function SettingsPage() {
       return;
     }
     if (formSupportsEmbedding && !formEmbeddingModel.trim()) {
-      showToast('支持向量化时需要填写向量模型，例如 GLM 填 embedding-3', 'error');
+      showToast('支持向量化时需要填写向量模型，例如硅基流动填 Qwen/Qwen3-Embedding-0.6B', 'error');
       return;
     }
     const embeddingDimensions = parseInt(formEmbeddingDimensions.trim(), 10);
@@ -321,7 +285,7 @@ export default function SettingsPage() {
       return;
     }
     if (formSupportsEmbedding && !formEmbeddingModel.trim()) {
-      showToast('支持向量化时需要填写向量模型，例如 GLM 填 embedding-3', 'error');
+      showToast('支持向量化时需要填写向量模型，例如硅基流动填 Qwen/Qwen3-Embedding-0.6B', 'error');
       return;
     }
     const embeddingDimensions = parseInt(formEmbeddingDimensions.trim(), 10);
@@ -915,7 +879,7 @@ export default function SettingsPage() {
                         }
                       }}
                       disabled={!!editingProvider}
-                      placeholder="例如: dashscope, deepseek, glm, kimi"
+                      placeholder="例如: deepseek, siliconflow"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600
                         bg-white dark:bg-slate-700 text-sm text-slate-900 dark:text-white
                         placeholder:text-slate-400 focus:outline-none focus:ring-2
@@ -987,7 +951,7 @@ export default function SettingsPage() {
                         }}
                         onFocus={() => currentPreset && setShowModelDropdown(true)}
                         onBlur={() => setTimeout(() => setShowModelDropdown(false), 150)}
-                        placeholder={currentPreset ? '从下拉列表选择或输入自定义聊天模型名' : '例如: qwen3.5-flash, deepseek-v4-flash, glm-5'}
+                        placeholder={currentPreset ? '从下拉列表选择或输入自定义聊天模型名' : '例如: deepseek-flash'}
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600
                           bg-white dark:bg-slate-700 text-sm text-slate-900 dark:text-white
                           placeholder:text-slate-400 focus:outline-none focus:ring-2
@@ -1034,7 +998,7 @@ export default function SettingsPage() {
                   <div>
                     <div className="mb-1.5 flex items-center justify-between gap-3">
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        向量模型 <span className="text-slate-400 font-normal">(知识库向量化，例如 GLM 填 embedding-3)</span>
+                        向量模型 <span className="text-slate-400 font-normal">(知识库向量化，例如 Qwen/Qwen3-Embedding-0.6B)</span>
                       </label>
                       <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
                         <input
@@ -1064,8 +1028,8 @@ export default function SettingsPage() {
                         onBlur={() => setTimeout(() => setShowEmbeddingDropdown(false), 150)}
                         disabled={!formSupportsEmbedding}
                         placeholder={formSupportsEmbedding
-                          ? (currentPreset?.embeddingModels ? '从下拉列表选择或输入自定义向量模型名' : '例如: text-embedding-v3, embedding-3')
-                          : 'DeepSeek / Kimi 等 Provider 通常不支持 Embedding'}
+                          ? (currentPreset?.embeddingModels ? '从下拉列表选择或输入自定义向量模型名' : '例如: Qwen/Qwen3-Embedding-0.6B')
+                          : 'DeepSeek 等 Provider 不支持 Embedding'}
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600
                           bg-white dark:bg-slate-700 text-sm text-slate-900 dark:text-white
                           placeholder:text-slate-400 focus:outline-none focus:ring-2

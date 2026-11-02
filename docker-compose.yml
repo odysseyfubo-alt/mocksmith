@@ -14,6 +14,8 @@ services:
     # 使用带有 pgvector 插件的 PostgreSQL 16 镜像
     image: pgvector/pgvector:pg16
     container_name: interview-postgres
+    # Docker Desktop 重启后自动拉起，避免应用启动时依赖不在
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
@@ -47,8 +49,11 @@ services:
   redis:
     image: redis:7
     container_name: interview-redis
+    # Docker Desktop 重启后自动拉起，避免应用启动时依赖不在
+    restart: unless-stopped
     ports:
-      - "6379:6379"
+      # 宿主端口可覆盖：本机 6379 被 Windows 原生 Redis 3.0 占用时，在 .env 里设 REDIS_HOST_PORT=6380
+      - "${REDIS_HOST_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -70,8 +75,14 @@ services:
   #     - 9001: 控制台端口，浏览器访问此端口管理文件
   # =========================================
   minio:
-    image: minio/minio
+    # 官方镜像来源说明：
+    #   - minio 官方自 2025 年起移除了 Docker Hub 上的 minio/minio、minio/mc 仓库，
+    #     且 quay.io/minio/minio 需要认证（拉取会返回 401 UNAUTHORIZED）。
+    #   - 这里使用社区维护的 pgsty 镜像（基于 MinIO 技术，兼容 S3 协议与 MINIO_ROOT_USER 等环境变量）。
+    image: pgsty/minio:latest
     container_name: interview-minio
+    # Docker Desktop 重启后自动拉起，避免应用启动时依赖不在
+    restart: unless-stopped
     # 启动命令：指定数据目录和控制台地址
     command: server /data --console-address ":9001"
     environment:
@@ -100,7 +111,8 @@ services:
   #   - 解决了"谁来创建 Bucket"的问题，实现了基础设施的自动化配置，无需手动操作。
   # =========================================
   createbuckets:
-    image: minio/mc
+    # 同理，minio/mc 官方镜像已下线，改用 pgsty/mc（命令与 mc 完全一致）
+    image: pgsty/mc:latest
     depends_on:
       minio:
         condition: service_healthy # 必须等待 MinIO 服务健康（不仅仅是启动）

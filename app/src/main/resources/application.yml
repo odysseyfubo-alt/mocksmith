@@ -29,7 +29,7 @@ spring:
   config:
     import: optional:classpath:voice-interview-opening.yml
   application:
-    name: ai-interview-platform
+    name: mocksmith
 
   # 启用虚拟线程 (Java 21+)
   # 显著提升 I/O 密集型场景的并发能力，特别适合 AI 调用和 SSE 长连接
@@ -96,8 +96,9 @@ spring:
 # Application custom configuration
 app:
   ai:
-    default-provider: dashscope
-    default-embedding-provider: dashscope
+    # 阿里云账号停用后：对话走 DeepSeek，向量走硅基流动（DeepSeek 无 Embedding 接口）
+    default-provider: deepseek
+    default-embedding-provider: siliconflow
     embedding-dimensions: ${APP_AI_EMBEDDING_DIMENSIONS:1024}
     security:
       api-key-encryption-key: ${APP_AI_CONFIG_ENCRYPTION_KEY:}
@@ -110,38 +111,20 @@ app:
     agent-utils:
       skills-root: ${APP_AI_AGENT_UTILS_SKILLS_ROOT:classpath:skills}
     providers:
-      dashscope:
-        base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
-        api-key: ${AI_BAILIAN_API_KEY}
-        model: ${AI_MODEL:qwen3.5-flash}
-        embedding-model: text-embedding-v3
-        embedding-dimensions: 1024
-        supports-embedding: true
-      lmstudio:
-        base-url: http://localhost:1234
-        api-key: ${PROVIDER_LMSTUDIO_API_KEY:lm-studio}
-        model: qwen2.5-7b-instruct
-        supports-embedding: false
-      # ===== 预设 Provider（填完 API Key 后即可使用）=====
-      # Moonshot AI / Kimi（OpenAI 兼容） https://platform.moonshot.cn/
-      kimi:
-        base-url: https://api.moonshot.cn/v1
-        api-key: ${PROVIDER_KIMI_API_KEY:}
-        model: ${PROVIDER_KIMI_MODEL:kimi-latest}
-        temperature: 1
-        supports-embedding: false
-      # DeepSeek（OpenAI 兼容） https://api-docs.deepseek.com/
+      # 只保留在用的两家：DeepSeek 对话 + 硅基流动向量（阿里云账号已封禁，DashScope 已移除）
+      # DeepSeek（OpenAI 兼容） https://api-docs.deepseek.com/ —— 默认对话模型，无 Embedding
       deepseek:
         base-url: https://api.deepseek.com
         api-key: ${PROVIDER_DEEPSEEK_API_KEY:}
-        model: ${PROVIDER_DEEPSEEK_MODEL:deepseek-v4-flash}
+        model: ${PROVIDER_DEEPSEEK_MODEL:deepseek-flash}
         supports-embedding: false
-      # 智谱 AI / GLM（OpenAI 兼容） https://open.bigmodel.cn/
-      glm:
-        base-url: https://open.bigmodel.cn/api/coding/paas/v4
-        api-key: ${PROVIDER_GLM_API_KEY:}
-        model: ${PROVIDER_GLM_MODEL:glm-5}
-        embedding-model: embedding-3
+      # 硅基流动（OpenAI 兼容） https://siliconflow.cn/ —— 默认 Embedding
+      # 注意：应用会给向量请求带 dimensions 参数，bge-m3 会 400（code 20015），必须用 Qwen3-Embedding 系
+      siliconflow:
+        base-url: https://api.siliconflow.cn/v1
+        api-key: ${PROVIDER_SILICONFLOW_API_KEY:}
+        model: ${PROVIDER_SILICONFLOW_MODEL:deepseek-ai/DeepSeek-V3}
+        embedding-model: ${PROVIDER_SILICONFLOW_EMBEDDING_MODEL:Qwen/Qwen3-Embedding-0.6B}
         embedding-dimensions: 1024
         supports-embedding: true
     advisors:
@@ -298,7 +281,7 @@ app:
       asr:
         url: wss://dashscope.aliyuncs.com/api-ws/v1/realtime
         model: qwen3-asr-flash-realtime
-        api-key: ${AI_BAILIAN_API_KEY}
+        api-key: ${AI_BAILIAN_API_KEY:}
         language: zh
         format: pcm
         sample-rate: 16000
@@ -312,7 +295,7 @@ app:
       # 音色列表文档：https://help.aliyun.com/zh/model-studio/qwen-tts-realtime
       tts:
         model: qwen3-tts-flash-realtime
-        api-key: ${AI_BAILIAN_API_KEY}
+        api-key: ${AI_BAILIAN_API_KEY:}
         voice: Cherry
         format: pcm
         sample-rate: 24000

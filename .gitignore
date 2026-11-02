@@ -28,3 +28,11 @@ frontend/test-results/
 frontend/playwright-report/
 /.agents
 skills-lock.json
+
+# 依赖与构建产物（原先漏了，push 上去会带几十万文件）
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.log
+.DS_Store
+Thumbs.db
